@@ -220,6 +220,7 @@ def render_fourier_vectors(fourier_coefficients, output_file="fourier_vectors.mp
                 if hasattr(coeff, 'item'):
                     coeff = complex(coeff.item().real, coeff.item().imag)
                 coeffs_data.append((freq, coeff.real, coeff.imag))
+            print("Fourier coefficients processed")
         else:
             coeffs_data = []
             for freq, coeff in fourier_coefficients:
