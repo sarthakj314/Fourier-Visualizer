@@ -4,6 +4,10 @@ import tempfile
 import shutil
 import subprocess
 from pathlib import Path
+from manim import config
+
+# Disable preview in headless environments
+config["preview"] = False
 
 def render_drawing(drawing_data, output_file="drawing_animation.mp4"):
     """

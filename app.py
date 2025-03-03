@@ -355,11 +355,18 @@ def main():
                 display_loading_animation(main_text="Generating Original Drawing Animation...", sub_text="This may take a few moments")
             
             # Generate a video of the drawing (this may take some time)
-            drawing_output_path = generate_fourier_drawing_video(canvas_result.json_data, "drawing.mp4")
-            
-            # Replace the loading animation with the actual video
-            with drawing_animation_placeholder.container():
-                display_looping_video(drawing_output_path, width="100%")
+            try:
+                drawing_output_path = generate_fourier_drawing_video(canvas_result.json_data, "drawing.mp4")
+                
+                # Replace the loading animation with the actual video
+                with drawing_animation_placeholder.container():
+                    if drawing_output_path is not None and os.path.exists(drawing_output_path):
+                        display_looping_video(drawing_output_path, width="100%")
+                    else:
+                        st.error("Failed to generate drawing animation. Showing drawing points instead.")
+            except Exception as e:
+                with drawing_animation_placeholder.container():
+                    st.error(f"Error generating drawing animation: {str(e)}")
         
         # Extract coordinates from the drawing
         for obj in canvas_result.json_data["objects"]:
