@@ -213,25 +213,33 @@ def display_looping_video(video_path, width=None, autoplay=True):
         width: Width of the video in pixels (optional)
         autoplay: Whether to autoplay the video (default: True)
     """
-    # Get the file name from the path
-    video_file = open(video_path, 'rb')
-    video_bytes = video_file.read()
-    
-    # Create HTML with autoplay and loop attributes
-    width_str = f"width=\"{width}\"" if width else "width=\"100%\""
-    autoplay_str = "autoplay" if autoplay else ""
-    
-    video_html = f"""
-    <div class="video-container">
-        <video {width_str} {autoplay_str} loop muted playsinline controls>
-            <source src="data:video/mp4;base64,{base64.b64encode(video_bytes).decode()}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-    </div>
-    """
-    
-    # Display the HTML
-    st.markdown(video_html, unsafe_allow_html=True)
+    # Check if video_path is None
+    if video_path is None:
+        st.error("Video file not found or could not be generated")
+        return
+        
+    try:
+        # Get the file name from the path
+        video_file = open(video_path, 'rb')
+        video_bytes = video_file.read()
+        
+        # Create HTML with autoplay and loop attributes
+        width_str = f"width=\"{width}\"" if width else "width=\"100%\""
+        autoplay_str = "autoplay" if autoplay else ""
+        
+        video_html = f"""
+        <div class="video-container">
+            <video {width_str} {autoplay_str} loop muted playsinline controls>
+                <source src="data:video/mp4;base64,{base64.b64encode(video_bytes).decode()}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        """
+        
+        # Display the HTML
+        st.markdown(video_html, unsafe_allow_html=True)
+    except Exception as e:
+        st.error(f"Error displaying video: {str(e)}")
 
 def display_loading_animation(main_text="Generating Fourier Vector Animation...", sub_text="This may take a few moments"):
     """Display a loading animation while the Fourier animation is being generated"""
@@ -441,19 +449,31 @@ def main():
                     """)
                     
                     # Generate the Fourier animation (this may take some time)
-                    fourier = FourierSeries(df['x'], df['y'], n=50)
-                    fourier.compute_series()
-                    coeffs = fourier.prepare_for_manim()
-                    output_path = generate_fourier_vector_video(coeffs, "fourier_vectors.mp4")
-                    
-                    # Store the output path and mark as ready
-                    st.session_state.fourier_output_path = output_path
-                    st.session_state.fourier_animation_ready = True
-                    
-                    # Replace the loading animation with the actual video
-                    with fourier_animation_placeholder.container():
-                        st.markdown("### 🔄 Fourier Series Representation")
-                        display_looping_video(output_path, width="100%")
+                    try:
+                        fourier = FourierSeries(df['x'], df['y'], n=50)
+                        fourier.compute_series()
+                        coeffs = fourier.prepare_for_manim()
+                        output_path = generate_fourier_vector_video(coeffs, "fourier_vectors.mp4")
+                        
+                        # Store the output path and mark as ready only if successful
+                        if output_path is not None and os.path.exists(output_path):
+                            st.session_state.fourier_output_path = output_path
+                            st.session_state.fourier_animation_ready = True
+                            
+                            # Replace the loading animation with the actual video
+                            with fourier_animation_placeholder.container():
+                                st.markdown("### 🔄 Fourier Series Representation")
+                                display_looping_video(output_path, width="100%")
+                        else:
+                            # Show error message if animation generation fails
+                            with fourier_animation_placeholder.container():
+                                st.markdown("### 🔄 Fourier Series Representation")
+                                st.error("Failed to generate Fourier animation. This feature may not be available in this environment.")
+                    except Exception as e:
+                        # Show error message if animation generation fails
+                        with fourier_animation_placeholder.container():
+                            st.markdown("### 🔄 Fourier Series Representation")
+                            st.error(f"Error generating Fourier animation: {str(e)}")
                 else:
                     # Display the already generated animation
                     with fourier_animation_placeholder.container():
