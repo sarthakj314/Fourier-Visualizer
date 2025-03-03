@@ -1,7 +1,7 @@
 # Core dependencies
 streamlit==1.42.0
 streamlit-drawable-canvas==0.9.3
-numpy==1.24.3
+numpy==2.23
 pandas==2.0.3
 matplotlib==3.7.2
 tqdm==4.66.1
@@ -13,9 +13,6 @@ torchvision==0.15.2
 # Manim dependencies (simplified)
 manim==0.19.0
 pycairo==1.23.0
-
-# Video processing
-ffmpeg-python==0.2.0
 
 # Utilities
 Pillow==9.5.0
