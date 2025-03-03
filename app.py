@@ -14,6 +14,7 @@ import numpy as np
 from fourier import FourierSeries
 from draw_fourier import generate_fourier_drawing_video, generate_fourier_vector_video
 import base64
+import time
 
 # Set page configuration
 st.set_page_config(
@@ -457,13 +458,14 @@ def main():
                     
                     # Generate the Fourier animation (this may take some time)
                     try:
-                        fourier = FourierSeries(df['x'], df['y'], n=50)
+                        fourier = FourierSeries(df['x'], df['y'], n=20)
                         fourier.compute_series()
                         coeffs = fourier.prepare_for_manim()
                         output_path = generate_fourier_vector_video(coeffs, "fourier_vectors.mp4")
                         
                         st.session_state.fourier_output_path = output_path
                         st.session_state.fourier_animation_ready = True
+                        time.sleep(60)
                         
                         # Replace the loading animation with the actual video
                         with fourier_animation_placeholder.container():
