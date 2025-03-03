@@ -1,7 +1,7 @@
 # Core dependencies
 streamlit==1.42.0
 streamlit-drawable-canvas==0.9.3
-numpy==2.23
+numpy==2.2.3
 pandas==2.0.3
 matplotlib==3.7.2
 tqdm==4.66.1
