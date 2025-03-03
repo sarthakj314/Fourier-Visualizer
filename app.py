@@ -462,20 +462,13 @@ def main():
                         coeffs = fourier.prepare_for_manim()
                         output_path = generate_fourier_vector_video(coeffs, "fourier_vectors.mp4")
                         
-                        # Store the output path and mark as ready only if successful
-                        if output_path is not None and os.path.exists(output_path):
-                            st.session_state.fourier_output_path = output_path
-                            st.session_state.fourier_animation_ready = True
-                            
-                            # Replace the loading animation with the actual video
-                            with fourier_animation_placeholder.container():
-                                st.markdown("### 🔄 Fourier Series Representation")
-                                display_looping_video(output_path, width="100%")
-                        else:
-                            # Show error message if animation generation fails
-                            with fourier_animation_placeholder.container():
-                                st.markdown("### 🔄 Fourier Series Representation")
-                                st.error("Failed to generate Fourier animation. This feature may not be available in this environment.")
+                        st.session_state.fourier_output_path = output_path
+                        st.session_state.fourier_animation_ready = True
+                        
+                        # Replace the loading animation with the actual video
+                        with fourier_animation_placeholder.container():
+                            st.markdown("### 🔄 Fourier Series Representation")
+                            display_looping_video(output_path, width="100%")
                     except Exception as e:
                         # Show error message if animation generation fails
                         with fourier_animation_placeholder.container():
