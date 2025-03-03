@@ -14,5 +14,8 @@ torchvision==0.15.2
 manim==0.17.3
 pycairo==1.23.0
 
+# Video processing
+ffmpeg-python==0.2.0
+
 # Utilities
 Pillow==9.5.0
