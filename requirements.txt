@@ -11,8 +11,8 @@ torch==2.0.1
 torchvision==0.15.2
 
 # Manim dependencies (simplified)
-manimpango
-pycairo
+manim==0.17.3
+pycairo==1.23.0
 
 # Utilities
 Pillow==9.5.0
