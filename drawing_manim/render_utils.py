@@ -82,8 +82,17 @@ class DrawingScene(Scene):
         self.wait(2)
             """)
         
-        # Run manim to render the scene
-        os.system(f"cd {temp_dir} && manim -pqh temp_scene.py DrawingScene --media_dir {temp_dir}/media")
+        # Run manim to render the scene without any preview or opening
+        os.environ["MPLBACKEND"] = "Agg"  # Force matplotlib to not use any Xwindows backend
+        os.environ["DISPLAY"] = ""  # Unset display to prevent any GUI operations
+
+        # Use subprocess with capture_output to suppress all output
+        subprocess.run(
+            f"cd {temp_dir} && manim -qh --disable_caching --format=mp4 --write_to_movie --progress_bar=none --preview=false --renderer=opengl --enable_gui=False temp_scene.py DrawingScene --media_dir {temp_dir}/media",
+            shell=True,
+            capture_output=True,
+            text=True
+        )
         
         # Find the generated video file
         video_path = None
