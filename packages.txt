@@ -3,3 +3,4 @@ libcairo2-dev
 libpango1.0-dev
 python3-dev
 ffmpeg
+xdg-utils
