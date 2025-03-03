@@ -1,33 +1,29 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import torch
 
 class FourierSeries:
     def __init__(self, x, y, n=501):
-        # Check if GPU is available
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        
-        # Convert input data to torch tensors
+        # Convert input data to numpy arrays
         if isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
-            x_tensor = torch.tensor(x, dtype=torch.float32, device=self.device)
-            y_tensor = torch.tensor(y, dtype=torch.float32, device=self.device)
+            x_array = x.astype(np.float32)
+            y_array = y.astype(np.float32)
         elif hasattr(x, 'x') and hasattr(x, 'y'):  # Handle DataFrame input
-            x_tensor = torch.tensor(x.x.values, dtype=torch.float32, device=self.device)
-            y_tensor = torch.tensor(x.y.values, dtype=torch.float32, device=self.device)
+            x_array = x.x.values.astype(np.float32)
+            y_array = x.y.values.astype(np.float32)
         else:
-            x_tensor = torch.tensor(x, dtype=torch.float32, device=self.device)
-            y_tensor = torch.tensor(y, dtype=torch.float32, device=self.device)
+            x_array = np.array(x, dtype=np.float32)
+            y_array = np.array(y, dtype=np.float32)
             
-        self.data = x_tensor + 1j * y_tensor
+        self.data = x_array + 1j * y_array
         self.n = n
         self.deg_start, self.deg_end = self.compute_deg_start_end()
-        self.c_n = torch.zeros(self.n, dtype=torch.complex64, device=self.device)
+        self.c_n = np.zeros(self.n, dtype=np.complex64)
 
         self.total_points = len(self.data)
-        self.t = torch.linspace(0, 1, self.total_points, device=self.device)
+        self.t = np.linspace(0, 1, self.total_points)
 
-        self.series_constant = torch.arange(self.deg_start, self.deg_end + 1, device=self.device)
-        self.series_constant = torch.exp(2j * torch.pi * self.series_constant)
+        self.series_constant = np.arange(self.deg_start, self.deg_end + 1)
+        self.series_constant = np.exp(2j * np.pi * self.series_constant)
 
     def compute_deg_start_end(self):
         tmp = (self.n - 1) / 2
@@ -35,43 +31,42 @@ class FourierSeries:
         return int(start), int(end)
     
     def compute_c_n(self, n):
-        exp_term = torch.exp(-2j * torch.pi * n * self.t)
-        return torch.sum(self.data * exp_term) / self.total_points
+        exp_term = np.exp(-2j * np.pi * n * self.t)
+        return np.sum(self.data * exp_term) / self.total_points
         
     def compute_series(self):
-        degrees = torch.arange(self.deg_start, self.deg_end + 1, device=self.device)
+        degrees = np.arange(self.deg_start, self.deg_end + 1)
         for i, deg in enumerate(degrees):
             self.c_n[i] = self.compute_c_n(deg)
 
     def compute_series_value(self, t):
-        if isinstance(t, np.ndarray):
-            t = torch.tensor(t, dtype=torch.float32, device=self.device)
+        if not isinstance(t, np.ndarray):
+            t = np.array(t, dtype=np.float32)
         
-        degrees = torch.arange(self.deg_start, self.deg_end + 1, device=self.device)
-        result = torch.zeros(len(t), dtype=torch.complex64, device=self.device)
+        degrees = np.arange(self.deg_start, self.deg_end + 1)
+        result = np.zeros(len(t), dtype=np.complex64)
         
         for i, deg in enumerate(degrees):
-            result += self.c_n[i] * torch.exp(2j * torch.pi * deg * t)
+            result += self.c_n[i] * np.exp(2j * np.pi * deg * t)
         
-        # Convert to CPU and numpy for compatibility with the rest of the code
-        return [result.real.cpu().numpy(), result.imag.cpu().numpy()]
+        return [result.real, result.imag]
 
     def return_series(self):
-        return self.c_n.cpu().numpy()
+        return self.c_n
     
     def export_series(self):
         return {
-            "c_n": self.c_n.cpu().numpy(),
+            "c_n": self.c_n,
             "deg_start": self.deg_start,
             "deg_end": self.deg_end,
             "n": self.n,
             "total_points": self.total_points,
-            "t": self.t.cpu().numpy(),
-            "series_constant": self.series_constant.cpu().numpy()
+            "t": self.t,
+            "series_constant": self.series_constant
         }
     
     def sample_n(self, n=10000):
-        t_smooth = torch.linspace(0, 1, n, device=self.device)
+        t_smooth = np.linspace(0, 1, n)
         reconstructed_points = self.compute_series_value(t_smooth)
         reconstructed_x, reconstructed_y = reconstructed_points
         return reconstructed_x, reconstructed_y
@@ -79,7 +74,7 @@ class FourierSeries:
     def plot_series(self, n=10000, plot_original=True):
         reconstructed_x, reconstructed_y = self.sample_n(n)
         if plot_original:
-            plt.scatter(self.data.real.cpu().numpy(), self.data.imag.cpu().numpy(), color='red', label='Original Points')
+            plt.scatter(self.data.real, self.data.imag, color='red', label='Original Points')
         plt.plot(reconstructed_x, reconstructed_y, color='blue', label='Fourier Reconstruction')
         plt.legend()
         plt.grid(True)
@@ -88,7 +83,7 @@ class FourierSeries:
     def prepare_for_manim(self):
         """
         Prepare Fourier coefficients for Manim visualization
-        Converts PyTorch tensors to Python native types for JSON serialization
+        Converts numpy arrays to Python native types for JSON serialization
         
         Returns:
             List of tuples (frequency, complex_coefficient) sorted by magnitude
@@ -99,8 +94,8 @@ class FourierSeries:
             freq = self.deg_start + i
             if freq == 0:
                 continue
-            # Convert tensor to Python complex number
-            coeff_value = complex(self.c_n[i].item().real, self.c_n[i].item().imag)
+            # Convert numpy complex to Python complex number
+            coeff_value = complex(self.c_n[i].real, self.c_n[i].imag)
             coeffs.append((freq, coeff_value))
         
         # Sort by magnitude (largest first)
@@ -125,12 +120,12 @@ class FourierSeries:
 
 
 if __name__ == "__main__":
-    x = np.linspace(-2, 2 - 1e-8, 1000)
+    x = np.linspace(-4, 4 - 1e-8, 2000)
     y = np.floor(x)%2
 
     fourier = FourierSeries(x, y)
     fourier.compute_series()
-    fourier.plot_series(n=100)
+    fourier.plot_series(n=10000)
     
     # Plot the histogram of the magnitude of c_n values
     plt.figure(figsize=(10, 6))
