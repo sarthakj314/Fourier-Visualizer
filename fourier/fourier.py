@@ -26,7 +26,7 @@ class FourierSeries:
         self.total_points = len(self.data)
         self.t = torch.linspace(0, 1, self.total_points, device=self.device)
 
-        self.series_constant = torch.linspace(self.deg_start, self.deg_end, self.n, device=self.device)
+        self.series_constant = torch.arange(self.deg_start, self.deg_end + 1, device=self.device)
         self.series_constant = torch.exp(2j * torch.pi * self.series_constant)
 
     def compute_deg_start_end(self):
@@ -58,6 +58,32 @@ class FourierSeries:
 
     def return_series(self):
         return self.c_n.cpu().numpy()
+    
+    def export_series(self):
+        return {
+            "c_n": self.c_n.cpu().numpy(),
+            "deg_start": self.deg_start,
+            "deg_end": self.deg_end,
+            "n": self.n,
+            "total_points": self.total_points,
+            "t": self.t.cpu().numpy(),
+            "series_constant": self.series_constant.cpu().numpy()
+        }
+    
+    def sample_n(self, n=10000):
+        t_smooth = torch.linspace(0, 1, n, device=self.device)
+        reconstructed_points = self.compute_series_value(t_smooth)
+        reconstructed_x, reconstructed_y = reconstructed_points
+        return reconstructed_x, reconstructed_y
+
+    def plot_series(self, n=10000, plot_original=True):
+        reconstructed_x, reconstructed_y = self.sample_n(n)
+        if plot_original:
+            plt.scatter(self.data.real.cpu().numpy(), self.data.imag.cpu().numpy(), color='red', label='Original Points')
+        plt.plot(reconstructed_x, reconstructed_y, color='blue', label='Fourier Reconstruction')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig("fourier_series.png")
  
     # f(t) = sum_{n = -infty}^{infty} c_n * e^{2pi*i*n*t}
     # integral from 0 to 1 of f(t) * e^(-2pi*i*n*t) dt = c_n
@@ -69,22 +95,7 @@ if __name__ == "__main__":
 
     fourier = FourierSeries(x, y)
     fourier.compute_series()
-    
-    t_smooth = np.linspace(0, 1, 1000) 
-    reconstructed_points = fourier.compute_series_value(t_smooth)
-    reconstructed_x, reconstructed_y = reconstructed_points
- 
-    # Plot the original points and Fourier reconstruction
-    plt.figure(figsize=(10, 6))    
-    plt.scatter(x, y, color='red', label='Original Points')
-    plt.plot(reconstructed_x, reconstructed_y, color='blue', label='Fourier Reconstruction')
-    
-    plt.legend()
-    plt.grid(True)
-    plt.title("Original Points vs Fourier Series Reconstruction")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.savefig("fourier_series.png")
+    fourier.plot_series(n=100)
     
     # Plot the histogram of the magnitude of c_n values
     plt.figure(figsize=(10, 6))

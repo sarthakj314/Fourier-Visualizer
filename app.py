@@ -1,8 +1,13 @@
+import os
+# Disable Streamlit's file watcher completely
+os.environ["STREAMLIT_SERVER_WATCH_FILES"] = "false"
+os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
+
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import pandas as pd
 import numpy as np
-from fourier import FourierSeries
+from fourier.fourier import FourierSeries
 
 def initialize_session_state():
     if 'stored_coordinates' not in st.session_state:
@@ -21,10 +26,10 @@ def calculate_stats(x_coords, y_coords):
         return {}
     
     return {
-        'x_mean': np.mean(x_coords),
-        'y_mean': np.mean(y_coords),
-        'x_std': np.std(x_coords),
-        'y_std': np.std(y_coords),
+        'x_min': np.min(x_coords),
+        'x_max': np.max(x_coords),
+        'y_min': np.min(y_coords),
+        'y_max': np.max(y_coords),
         'total_points': len(x_coords),
         'path_length': np.sum(np.sqrt(np.diff(x_coords)**2 + np.diff(y_coords)**2))
     }
@@ -36,8 +41,8 @@ def display_stats_card(title, value, description=""):
 def main():
     initialize_session_state()
 
-    st.title("✏️ Drawing Analyzer")
-    st.write("Use the canvas below to free-draw. Click 'Clear' to erase your drawing.")
+    st.title("✏️ Fourier Series")
+    st.write("Use the canvas below to draw anything you want! Soon you will be able to see the Fourier Series of your drawing.")
 
     if st.button("🗑️ Clear Canvas"):
         st.session_state.canvas_key = str(pd.Timestamp.now())
@@ -60,25 +65,47 @@ def main():
     if canvas_result.json_data is not None:
         x_coords = []
         y_coords = []
+        num_interpolated_points = 3
         
         for obj in canvas_result.json_data["objects"]:
             for command in obj["path"]:
                 if isinstance(command, list):
-                    if command[0] in ['M', 'L']:
+                    if command[0] == 'M':
+                        # Move command - just add the point
                         x, y = command[1], command[2]
-                        # Ignore points outside the canvas
                         if 0 <= x <= st.session_state.canvas_width and 0 <= y <= st.session_state.canvas_height:
                             x_coords.append(x)
                             y_coords.append(y)
+                    elif command[0] == 'L':
+                        # Line command
+                        x1, y1 = command[1], command[2]
+                        if x_coords and y_coords:
+                            x0, y0 = x_coords[-1], y_coords[-1]
+                            for i in range(1, num_interpolated_points + 1):
+                                t = i / num_interpolated_points
+                                x = x0 + t * (x1 - x0)
+                                y = y0 + t * (y1 - y0)
+                                if 0 <= x <= st.session_state.canvas_width and 0 <= y <= st.session_state.canvas_height:
+                                    x_coords.append(x)
+                                    y_coords.append(y)
                     elif command[0] == 'Q':
-                        x, y = command[3], command[4]
-                        # Ignore points outside the canvas
-                        if 0 <= x <= st.session_state.canvas_width and 0 <= y <= st.session_state.canvas_height:
-                            x_coords.append(x)
-                            y_coords.append(y)
+                        # Quadratic bezier curve
+                        x0, y0 = x_coords[-1], y_coords[-1] # Start point
+                        x1, y1 = command[1], command[2] # Control point
+                        x2, y2 = command[3], command[4] # End point
+                        
+                        for i in range(1, num_interpolated_points + 1):
+                            t = i / num_interpolated_points
+                            # Quadratic bezier formula: B(t) = (1-t)²P₀ + 2(1-t)tP₁ + t²P₂
+                            x = (1-t)**2 * x0 + 2*(1-t)*t * x1 + t**2 * x2
+                            y = (1-t)**2 * y0 + 2*(1-t)*t * y1 + t**2 * y2
+                            if 0 <= x <= st.session_state.canvas_width and 0 <= y <= st.session_state.canvas_height:
+                                x_coords.append(x)
+                                y_coords.append(y)
         
         if x_coords and y_coords:
             st.session_state.stored_coordinates = list(zip(x_coords, y_coords))
+            y_coords = [-y for y in y_coords]
             stats = calculate_stats(x_coords, y_coords)
 
             df = pd.DataFrame({
@@ -86,11 +113,10 @@ def main():
                 'y': y_coords
             })
 
-            fourier = FourierSeries(df)
+
+            fourier = FourierSeries(df['x'], df['y'])
             fourier.compute_series()
-            times = np.linspace(0, 1, stats['total_points'])            
-            series_values = fourier.compute_series_value(times)
-            print(series_values)
+            fourier.plot_series(n=1000)
 
             # Separate rows for Drawing Points and Drawing Statistics
             st.write("📊 Drawing Points")
@@ -109,13 +135,13 @@ def main():
                 st.markdown("### 🎯 Detailed Statistics")
                 detailed_cols = st.columns(4)
                 with detailed_cols[0]:
-                    st.metric(label="Mean X", value=f"{stats['x_mean']:.3f}", help="Average X coordinate")
+                    st.metric(label="Min X", value=f"{stats['x_min']:.3f}", help="Minimum X coordinate")
                 with detailed_cols[1]:
-                    st.metric(label="Mean Y", value=f"{stats['y_mean']:.3f}", help="Average Y coordinate")
+                    st.metric(label="Max X", value=f"{stats['x_max']:.3f}", help="Maximum X coordinate")
                 with detailed_cols[2]:
-                    st.metric(label="Std Dev X", value=f"{stats['x_std']:.3f}", help="Variation in X coordinates")
+                    st.metric(label="Min Y", value=f"{stats['y_min']:.3f}", help="Minimum Y coordinate")
                 with detailed_cols[3]:
-                    st.metric(label="Std Dev Y", value=f"{stats['y_std']:.3f}", help="Variation in Y coordinates")
+                    st.metric(label="Max Y", value=f"{stats['y_max']:.3f}", help="Maximum Y coordinate")
 
 if __name__ == "__main__":
     main()
