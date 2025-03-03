@@ -1,10 +1,6 @@
 from manim import *
 import numpy as np
 import json
-import os
-import shutil
-import tempfile
-from fourier_scene import FourierDrawingScene
 from render_utils import render_drawing
 
 
@@ -39,8 +35,8 @@ class FourierDrawing(Scene):
                         control_point = np.array([control_x, control_y, 0])
                         end_point = np.array([end_x, end_y, 0])
                         
-                        # Add quadratic bezier curve
-                        path.add_quadratic_bezier(control_point, end_point)
+                        # Use add_quadratic_bezier_curve_to for quadratic bezier curves
+                        path.add_quadratic_bezier_curve_to(control_point, end_point)
                         current_point = end_point
             
             return path
@@ -126,7 +122,7 @@ class DrawingScene(Scene):
                         control_point = np.array([control_x, control_y, 0])
                         end_point = np.array([end_x, end_y, 0])
                         
-                        path.add_quadratic_bezier(control_point, end_point)
+                        path.add_quadratic_bezier_curve_to(control_point, end_point)
                         current_point = end_point
             
             return path
@@ -185,6 +181,33 @@ def generate_fourier_drawing_video(drawing_data, output_file="fourier_drawing.mp
     return output_file
 
 
+def generate_fourier_vector_video(fourier_coefficients, output_file="fourier_vectors.mp4", num_frames=240, drawing_duration=5, show_progress=True, zoom_factor=1.0):
+    """
+    Generate a video of Fourier vectors drawing a path
+    
+    Args:
+        fourier_coefficients: List of tuples (frequency, complex_coefficient)
+                             ordered by coefficient magnitude (largest first)
+        output_file: Output file path for the animation
+        num_frames: Number of frames for the animation
+        drawing_duration: Duration of the drawing animation in seconds
+        show_progress: Whether to show a progress bar
+        zoom_factor: Controls how much to zoom out (higher values show more context)
+        
+    Returns:
+        Path to the output file if successful, None otherwise
+    """
+    from render_utils import render_fourier_vectors
+    return render_fourier_vectors(
+        fourier_coefficients, 
+        output_file, 
+        num_frames, 
+        drawing_duration,
+        show_progress,
+        zoom_factor
+    )
+
+
 if __name__ == "__main__":
     # Example usage with a properly sized shape
     sample_drawing = {
@@ -201,6 +224,27 @@ if __name__ == "__main__":
         ]
     }
     
-    # Generate a video
+    # Generate a video of the drawing
     output_path = generate_fourier_drawing_video(sample_drawing, "square_drawing.mp4")
     print(f"Video saved to: {output_path}")
+    
+    # Generate a sample Fourier series and create a vector animation
+    import numpy as np
+    
+    # Create sample Fourier coefficients (a simple circle)
+    coefficients = []
+    # Add the fundamental frequency (n=1)
+    coefficients.append((1, complex(0, 1)))  # Coefficient for e^(2πi*t)
+    # Add some harmonics with decreasing magnitudes
+    for n in range(2, 10):
+        magnitude = 1.0 / n  # Decreasing magnitude
+        phase = np.random.uniform(0, 2*np.pi)  # Random phase
+        coefficients.append((n, complex(magnitude * np.cos(phase), magnitude * np.sin(phase))))
+        coefficients.append((-n, complex(magnitude * np.cos(-phase), magnitude * np.sin(-phase))))
+    
+    # Sort by magnitude (largest first)
+    coefficients.sort(key=lambda x: abs(x[1]), reverse=True)
+    
+    # Generate the Fourier vector animation
+    fourier_output = generate_fourier_vector_video(coefficients, "fourier_vectors_demo.mp4")
+    print(f"Fourier vector animation saved to: {fourier_output}")

@@ -84,6 +84,41 @@ class FourierSeries:
         plt.legend()
         plt.grid(True)
         plt.savefig("fourier_series.png")
+
+    def prepare_for_manim(self):
+        """
+        Prepare Fourier coefficients for Manim visualization
+        Converts PyTorch tensors to Python native types for JSON serialization
+        
+        Returns:
+            List of tuples (frequency, complex_coefficient) sorted by magnitude
+            with coefficients normalized to fit within the Manim screen
+        """
+        coeffs = []
+        for i, idx in enumerate(range(self.n)):
+            freq = self.deg_start + i
+            if freq == 0:
+                continue
+            # Convert tensor to Python complex number
+            coeff_value = complex(self.c_n[i].item().real, self.c_n[i].item().imag)
+            coeffs.append((freq, coeff_value))
+        
+        # Sort by magnitude (largest first)
+        coeffs.sort(key=lambda x: abs(x[1]), reverse=True)
+        
+        # Normalize coefficients to ensure they fit within the Manim screen
+        # Find the maximum magnitude
+        max_magnitude = max(abs(coeff) for _, coeff in coeffs) if coeffs else 1.0
+        
+        # Scale factor - adjust this value based on desired arrow size in Manim
+        # A value of 3-4 typically works well for Manim's default camera frame
+        scale_factor = 1
+        
+        # Normalize all coefficients
+        normalized_coeffs = [(freq, coeff * scale_factor / max_magnitude) 
+                             for freq, coeff in coeffs]
+        
+        return normalized_coeffs
  
     # f(t) = sum_{n = -infty}^{infty} c_n * e^{2pi*i*n*t}
     # integral from 0 to 1 of f(t) * e^(-2pi*i*n*t) dt = c_n
