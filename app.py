@@ -465,7 +465,6 @@ def main():
                         
                         st.session_state.fourier_output_path = output_path
                         st.session_state.fourier_animation_ready = True
-                        time.sleep(60)
                         
                         # Replace the loading animation with the actual video
                         with fourier_animation_placeholder.container():

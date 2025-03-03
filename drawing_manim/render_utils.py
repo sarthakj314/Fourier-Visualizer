@@ -227,8 +227,10 @@ def render_fourier_vectors(fourier_coefficients, output_file="fourier_vectors.mp
                 if hasattr(coeff, 'item'):
                     coeff = complex(coeff.item().real, coeff.item().imag)
                 coeffs_data.append((freq, coeff.real, coeff.imag))
-        
+
+        print("Coeffs data: ", coeffs_data)
         coeffs_json = json.dumps(coeffs_data)
+        print("Coeffs json: ", coeffs_json)
         
         # Create a custom config file to ensure headless operation
         config_path = os.path.join(temp_dir, "manim.cfg")
