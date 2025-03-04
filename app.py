@@ -352,6 +352,7 @@ def display_metric_card(label, value, dark_mode=False):
 def display_looping_video(video_path, width=None, autoplay=True, zoomable=True):
     """
     Display a video with autoplay and loop enabled, with optional zoom capability
+    Video is natively downloadable via browser right-click
     
     Args:
         video_path: Path to the video file
@@ -372,17 +373,21 @@ def display_looping_video(video_path, width=None, autoplay=True, zoomable=True):
         
         # Create a unique ID for this video
         video_id = f"video_{hash(video_path)}"
+        filename = os.path.basename(video_path)
         
         # Create HTML with autoplay and loop attributes
+        # Add controlsList="nodownload" to prevent native download button but allow right-click download
         width_str = f"width=\"{width}\"" if width else "width=\"100%\""
         autoplay_str = "autoplay" if autoplay else ""
         
         container_class = "zoomable-video-container" if zoomable else "video-container"
         
         # Create the HTML for the video container and video element
+        # Use the filename in the download attribute to suggest a filename when downloading
         video_html = f"""
         <div class="{container_class}" id="{video_id}_container">
-            <video id="{video_id}" {width_str} {autoplay_str} loop muted playsinline controls>
+            <video id="{video_id}" {width_str} {autoplay_str} loop muted playsinline controls 
+                   title="Right-click to download" download="{filename}">
                 <source src="data:video/mp4;base64,{base64.b64encode(video_bytes).decode()}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -721,6 +726,7 @@ def main():
                 
                 fourier = FourierSeries(df['x'], df['y'], n=FOURIER_TERMS)
                 fourier.compute_series()
+                fourier.plot_series()
                 coeffs = fourier.prepare_for_manim(scale_factor=FOURIER_SCALE_FACTOR)
                 output_path = generate_fourier_vector_video(coeffs, "fourier_vectors.mp4", 
                                                           num_frames=FOURIER_ANIMATION_FRAMES, 
