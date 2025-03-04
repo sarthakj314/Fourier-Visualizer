@@ -7,7 +7,7 @@ Transform your doodles into mesmerizing mathematical animations with this intera
     <tr>
       <td width="50%">
         <img src="https://raw.githubusercontent.com/sarthakj314/fourier-visualizer/main/examples/fourier_series.png" alt="Fourier Series Visualization" width="100%">
-        <p align="center"><em>✨ Mathematical Magic in Motion ✨</em></p>
+        <p align="center"><em>Fourier Series Motion</em></p>
       </td>
       <td width="50%">
         <img src="https://raw.githubusercontent.com/sarthakj314/fourier-visualizer/main/examples/fourier_vectors.gif" alt="Fourier Vectors Animation" width="100%">
