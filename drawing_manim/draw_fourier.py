@@ -65,13 +65,14 @@ def load_drawing_from_json(json_file_path):
     return drawing_data
 
 
-def render_drawing(drawing_data, output_file="drawing_animation.mp4"):
+def render_drawing(drawing_data, output_file="drawing_animation.mp4", drawing_duration=3):
     """
     Render a drawing animation from drawing data
     
     Args:
         drawing_data: JSON data from Streamlit's canvas
         output_file: Output file path for the animation
+        drawing_duration: Duration of the drawing animation in seconds (default: 3)
     """
     import os
     import shutil
@@ -139,9 +140,9 @@ class DrawingScene(Scene):
         all_paths.scale_to_fit_width(6)  # Smaller width
         all_paths.scale_to_fit_height(4)  # Smaller height
         
-        # Animate the drawing
-        self.play(Create(all_paths), run_time=3)
-        self.wait(2)
+        # Animate the drawing with the specified duration
+        self.play(Create(all_paths), run_time={drawing_duration})
+        self.wait(1)
         """)
     
     # Run manim to render the scene in the temp directory
@@ -166,18 +167,19 @@ class DrawingScene(Scene):
     shutil.rmtree(temp_dir)
 
 
-def generate_fourier_drawing_video(drawing_data, output_file="fourier_drawing.mp4"):
+def generate_fourier_drawing_video(drawing_data, output_file="fourier_drawing.mp4", drawing_duration=3):
     """
     Generate a video of a drawing using the FourierDrawingScene
     
     Args:
         drawing_data: JSON data from Streamlit's canvas or a dictionary with path commands
         output_file: Output file path for the animation
+        drawing_duration: Duration of the drawing animation in seconds (default: 3)
         
     Returns:
         Path to the output file if successful, None otherwise
     """
-    render_drawing(drawing_data, output_file)
+    render_drawing(drawing_data, output_file, drawing_duration=drawing_duration)
     return output_file
 
 

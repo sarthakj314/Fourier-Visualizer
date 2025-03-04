@@ -80,7 +80,7 @@ class FourierSeries:
         plt.grid(True)
         plt.savefig("fourier_series.png")
 
-    def prepare_for_manim(self):
+    def prepare_for_manim(self, scale_factor=1):
         """
         Prepare Fourier coefficients for Manim visualization
         Converts numpy arrays to Python native types for JSON serialization
@@ -103,11 +103,7 @@ class FourierSeries:
         
         # Normalize coefficients to ensure they fit within the Manim screen
         # Find the maximum magnitude
-        max_magnitude = max(abs(coeff) for _, coeff in coeffs) if coeffs else 1.0
-        
-        # Scale factor - adjust this value based on desired arrow size in Manim
-        # A value of 3-4 typically works well for Manim's default camera frame
-        scale_factor = 1
+        max_magnitude = max(abs(coeff) for _, coeff in coeffs) if coeffs else 1.0 
         
         # Normalize all coefficients
         normalized_coeffs = [(freq, coeff * scale_factor / max_magnitude) 

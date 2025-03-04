@@ -9,13 +9,14 @@ from manim import config
 # Disable preview in headless environments
 config["preview"] = False
 
-def render_drawing(drawing_data, output_file="drawing_animation.mp4"):
+def render_drawing(drawing_data, output_file="drawing_animation.mp4", drawing_duration=3):
     """
     Render a drawing animation from drawing data in completely headless mode
     
     Args:
         drawing_data: JSON data from Streamlit's canvas
         output_file: Output file path for the animation
+        drawing_duration: Duration of the drawing animation in seconds (default: 3)
         
     Returns:
         Path to the output file if successful, None otherwise
@@ -110,9 +111,9 @@ class DrawingScene(Scene):
         all_paths.scale_to_fit_width(6)  # Smaller width
         all_paths.scale_to_fit_height(4)  # Smaller height
         
-        # Animate the drawing
-        self.play(Create(all_paths), run_time=3)
-        self.wait(2)
+        # Animate the drawing of the path with the specified duration
+        self.play(Create(all_paths), run_time={drawing_duration})
+        self.wait(1)
             """)
         
         # Set environment variables to prevent any GUI operations
@@ -229,9 +230,7 @@ def render_fourier_vectors(fourier_coefficients, output_file="fourier_vectors.mp
                     coeff = complex(coeff.item().real, coeff.item().imag)
                 coeffs_data.append((freq, coeff.real, coeff.imag))
 
-        print("Coeffs data: ", coeffs_data)
         coeffs_json = json.dumps(coeffs_data)
-        print("Coeffs json: ", coeffs_json)
         
         # Create a custom config file to ensure headless operation
         config_path = os.path.join(temp_dir, "manim.cfg")
