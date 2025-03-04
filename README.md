@@ -59,11 +59,11 @@ In practice, we use a finite number of terms (default: 60) to approximate your d
 ## 🚀 Get Started
 
 ### 🧰 Prerequisites
-- Python 3.7+ (the foundation)
-- PyTorch (the engine)
-- Streamlit (the interface)
-- Manim (the animator)
-- NumPy and Pandas (the data wizards)
+- Python 3.7+
+- PyTorch
+- Streamlit
+- Manim
+- NumPy and Pandas
 
 ### ⚙️ Setup
 1. Clone the repository to your machine
@@ -72,6 +72,7 @@ In practice, we use a finite number of terms (default: 60) to approximate your d
 4. Launch into the experience: `streamlit run app.py`
 
 ## ⚡ Performance Tips
+You can adjust these parameters at the top of app.py:
 - Adjust the number of Fourier terms (default: 60) to balance detail and speed
 - Canvas dimensions (default: 1200×500)
 - Drawing processing parameters:
@@ -87,4 +88,4 @@ In practice, we use a finite number of terms (default: 60) to approximate your d
 - Your drawing data persists between interactions thanks to session state magic
 - The canvas adapts perfectly to your device with responsive CSS
 - Animations are crafted as MP4 files and seamlessly embedded using base64 encoding
-- Elegant loading animations keep you informed during intensive calculations
+- Elegant loading animations keep you informed during calculations
