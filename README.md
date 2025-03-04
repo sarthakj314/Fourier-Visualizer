@@ -19,7 +19,7 @@ Transform your doodles into mesmerizing mathematical animations with this intera
 
 ## 🚀 Overview
 
-Dive into the fascinating world of Fourier Series as this application transforms your hand-drawn creations into a symphony of rotating vectors (epicycles).
+This project is an interactive application that demonstrates Fourier Series concepts. It converts user drawings into a series of rotating vectors (epicycles) that trace the original drawing. The application illustrates how any complex pattern can be decomposed into a sum of circular motions with varying frequencies and amplitudes, providing a visual representation of Fourier Series decomposition.
 
 ## 🧠 The Math Behind the Magic
 
