@@ -6,12 +6,12 @@ Transform your doodles into mesmerizing mathematical animations with this intera
   <table>
     <tr>
       <td width="50%">
-        <img src="https://raw.githubusercontent.com/yourusername/fourier-visualizer/fourier_series.png" alt="Fourier Series Visualization" width="100%">
+        <img src="https://raw.githubusercontent.com/sarthakj314/fourier-visualizer/fourier_series.png" alt="Fourier Series Visualization" width="100%">
         <p align="center"><em>✨ Mathematical Magic in Motion ✨</em></p>
       </td>
       <td width="50%">
         <video width="100%" autoplay loop muted playsinline>
-          <source src="https://raw.githubusercontent.com/yourusername/fourier-visualizer/fourier_vectors.mp4" type="video/mp4">
+          <source src="https://raw.githubusercontent.com/sarthakj314/fourier-visualizer/fourier_vectors.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
         <p align="center"><em>🔄 Epicycles in Action 🔄</em></p>
