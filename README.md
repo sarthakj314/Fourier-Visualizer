@@ -1,4 +1,4 @@
-# ✨ Fourier Series Visualizer: Art Meets Mathematics ✨
+# ✨ Fourier Series Visualizer ✨
 
 Transform your doodles into mesmerizing mathematical animations with this interactive Fourier Series web app! Draw any shape and watch in awe as it's recreated through an elegant dance of rotating vectors, revealing how even the most complex patterns can emerge from simple circular motions.
 
@@ -19,41 +19,7 @@ Transform your doodles into mesmerizing mathematical animations with this intera
 
 ## 🚀 Overview
 
-Dive into the fascinating world of Fourier Series as this application transforms your hand-drawn creations into a symphony of rotating vectors (epicycles). Experience the perfect blend of art, mathematics, and interactive visualization:
-
-- ✏️ Intuitive drawing canvas for your creative expression
-- 🎬 Watch your drawing come to life in real-time
-- 🔄 Marvel at the hypnotic Fourier vector representation
-- 📊 Explore the data behind your artistic creation
-
-## ✨ Features
-
-### 🎨 Drawing Interface
-- Fluid, responsive canvas that captures your every stroke
-- One-click reset to unleash your creativity again and again
-- Smart interpolation that smooths out your drawing
-- Support for various drawing techniques (move, line, quadratic bezier curves)
-
-### 🌈 Stunning Visualizations
-- See your drawing unfold in a captivating animation
-- Witness the mesmerizing dance of epicycles with adjustable complexity
-- Explore your creation through interactive data visualization
-- Track comprehensive statistics about your masterpiece
-- Sleek dark mode for an enhanced viewing experience
-
-### 🔧 Powerful Technology
-- Lightning-fast Fourier computations powered by PyTorch with GPU acceleration
-- Cinematic-quality animations courtesy of Manim
-- Seamless interactive experience built on Streamlit
-- Optimized video embedding using Base64 encoding
-- Responsive design that looks gorgeous on any device
-
-## 🔍 How It Works
-
-1. **✏️ Capture Your Creation**: Your drawing is captured as a series of precise path commands
-2. **🧮 Extract the Essence**: These commands transform into coordinates with smart interpolation for smooth curves
-3. **⚡ Fourier Magic**: Your drawing enters the frequency domain through mathematical wizardry
-4. **🎭 Vector Performance**: Watch as rotating vectors dance in perfect harmony to recreate your drawing
+Dive into the fascinating world of Fourier Series as this application transforms your hand-drawn creations into a symphony of rotating vectors (epicycles).
 
 ## 🧠 The Math Behind the Magic
 
@@ -72,6 +38,24 @@ Where:
 - $f(t)$ is the complex function representing your artistic creation
 - $\omega = \frac{2\pi}{T}$ is the angular frequency
 
+The complete Fourier series reconstruction of your drawing is given by:
+
+$$f(t) = \sum_{n=-\infty}^{\infty} c_n e^{i n \omega t}$$
+
+In practice, we use a finite number of terms (default: 60) to approximate your drawing. Each term corresponds to a rotating vector (epicycle) in our animation:
+
+- The frequency $n$ determines how fast each vector rotates
+- The magnitude $|c_n|$ determines the length of each vector
+- The phase $\arg(c_n)$ determines the starting angle of each vector
+
+### 🔄 From Drawing to Fourier Coefficients
+
+1. Your drawing is sampled as a series of (x,y) points along a path
+2. These points are converted to complex numbers: $z(t) = x(t) + i y(t)$
+3. We normalize the path parameter $t$ to range from 0 to 1
+4. The discrete Fourier transform is applied to calculate coefficients
+5. Coefficients are sorted by magnitude to prioritize the most significant vectors
+
 ## 🚀 Get Started
 
 ### 🧰 Prerequisites
@@ -84,18 +68,20 @@ Where:
 ### ⚙️ Setup
 1. Clone the repository to your machine
 2. Summon the dependencies: `pip install -r requirements.txt`
-3. Launch into the experience: `streamlit run app.py`
-
-### 🎮 Creating Your Masterpiece
-1. Let your creativity flow on the canvas
-2. Watch as the app instantly processes your artistic expression
-3. Compare your original drawing with its mathematical twin
-4. Experiment with different shapes and discover new patterns in the frequency domain
+3. For system dependencies: `apt-get install $(cat packages.txt)`
+4. Launch into the experience: `streamlit run app.py`
 
 ## ⚡ Performance Tips
-- Complex masterpieces with intricate details may require more processing time
-- Adjust the number of Fourier terms (default: 50) to balance detail and speed
-- For the ultimate experience, use a device with GPU support
+- Adjust the number of Fourier terms (default: 60) to balance detail and speed
+- Canvas dimensions (default: 1200×500)
+- Drawing processing parameters:
+  - Interpolation points (default: 15) control smoothness between path commands
+  - Point simplification distance (default: 1.0) reduces unnecessary points
+- Animation settings:
+  - Drawing animation duration (default: 5s)
+  - Fourier animation duration (default: 6s)
+  - Fourier animation frames (default: 100)
+  - Fourier scale factor (default: 1.5)
 
 ## 🔧 Behind the Scenes
 - Your drawing data persists between interactions thanks to session state magic
