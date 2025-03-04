@@ -458,7 +458,7 @@ def main():
                     
                     # Generate the Fourier animation (this may take some time)
                     try:
-                        fourier = FourierSeries(df['x'], df['y'], n=20)
+                        fourier = FourierSeries(df['x'], df['y'], n=50)
                         fourier.compute_series()
                         coeffs = fourier.prepare_for_manim()
                         output_path = generate_fourier_vector_video(coeffs, "fourier_vectors.mp4")
